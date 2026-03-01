@@ -1,0 +1,111 @@
+﻿<Window x:Class="ImageProcessing.WpfApp.ResultWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Analytical Dashboard" Height="700" Width="1100" Background="#1E1E1E" Foreground="White">
+
+	<Window.Resources>
+		<Style TargetType="TextBlock">
+			<Setter Property="Foreground" Value="#ECECEC"/>
+			<Setter Property="FontSize" Value="13"/>
+			<Setter Property="Margin" Value="0,2"/>
+		</Style>
+		<Style TargetType="GroupBox">
+			<Setter Property="Foreground" Value="#00A8E8"/>
+			<Setter Property="BorderBrush" Value="#333333"/>
+			<Setter Property="Margin" Value="0,5,0,10"/>
+			<Setter Property="Padding" Value="10"/>
+		</Style>
+	</Window.Resources>
+
+	<Grid Margin="10">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="6*"/>
+			<ColumnDefinition Width="4*"/>
+		</Grid.ColumnDefinitions>
+
+		<Border BorderBrush="#333333" BorderThickness="1" Grid.Column="0" Margin="0,0,10,0" Background="#121212">
+			<Image Name="ResultImage" Stretch="Uniform"/>
+		</Border>
+
+		<ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" Padding="0,0,10,0">
+			<StackPanel Name="AnalyticsPanel">
+
+				<TextBlock Name="TxtTitle" FontSize="20" FontWeight="Bold" Foreground="#00A8E8" Margin="0,0,0,15"/>
+
+				<GroupBox Header="Operation Details">
+					<StackPanel>
+						<TextBlock Name="TxtExecutionTime"/>
+						<TextBlock Name="TxtParameters"/>
+						<TextBlock Name="TxtFormula" FontStyle="Italic" Foreground="#FFD700"/>
+					</StackPanel>
+				</GroupBox>
+
+				<GroupBox Header="Image Metadata">
+					<StackPanel>
+						<TextBlock Name="TxtDimensions"/>
+						<TextBlock Name="TxtPixelCount"/>
+						<TextBlock Name="TxtMemoryUsage"/>
+					</StackPanel>
+				</GroupBox>
+
+				<GroupBox Header="Intensity Statistics (Before vs After)">
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*"/>
+							<ColumnDefinition Width="*"/>
+							<ColumnDefinition Width="*"/>
+						</Grid.ColumnDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="Auto"/>
+						</Grid.RowDefinitions>
+
+						<TextBlock Text="Metric" FontWeight="Bold" Grid.Row="0" Grid.Column="0"/>
+						<TextBlock Text="Before" FontWeight="Bold" Grid.Row="0" Grid.Column="1"/>
+						<TextBlock Text="After" FontWeight="Bold" Grid.Row="0" Grid.Column="2"/>
+
+						<TextBlock Text="Min" Grid.Row="1" Grid.Column="0"/>
+						<TextBlock Name="TxtMinB" Grid.Row="1" Grid.Column="1"/>
+						<TextBlock Name="TxtMinA" Grid.Row="1" Grid.Column="2"/>
+
+						<TextBlock Text="Max" Grid.Row="2" Grid.Column="0"/>
+						<TextBlock Name="TxtMaxB" Grid.Row="2" Grid.Column="1"/>
+						<TextBlock Name="TxtMaxA" Grid.Row="2" Grid.Column="2"/>
+
+						<TextBlock Text="Mean" Grid.Row="3" Grid.Column="0"/>
+						<TextBlock Name="TxtMeanB" Grid.Row="3" Grid.Column="1"/>
+						<TextBlock Name="TxtMeanA" Grid.Row="3" Grid.Column="2"/>
+
+						<TextBlock Text="StdDev" Grid.Row="4" Grid.Column="0"/>
+						<TextBlock Name="TxtStdDevB" Grid.Row="4" Grid.Column="1"/>
+						<TextBlock Name="TxtStdDevA" Grid.Row="4" Grid.Column="2"/>
+
+						<TextBlock Text="Entropy" Grid.Row="5" Grid.Column="0"/>
+						<TextBlock Name="TxtEntropyB" Grid.Row="5" Grid.Column="1"/>
+						<TextBlock Name="TxtEntropyA" Grid.Row="5" Grid.Column="2"/>
+
+						<TextBlock Text="Contrast" Grid.Row="6" Grid.Column="0"/>
+						<TextBlock Name="TxtContrastB" Grid.Row="6" Grid.Column="1"/>
+						<TextBlock Name="TxtContrastA" Grid.Row="6" Grid.Column="2"/>
+					</Grid>
+				</GroupBox>
+
+				<GroupBox Name="GrpSpecificInsights" Header="Algorithm Insights" Visibility="Collapsed">
+					<StackPanel Name="SpecificInsightsPanel"/>
+				</GroupBox>
+
+				<GroupBox Header="Visual Data" Height="220">
+					<Grid>
+						<Canvas Name="ChartCanvas" Background="#121212" Margin="5"/>
+						<TextBlock Name="TxtChartLegend" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="10" FontSize="10"/>
+					</Grid>
+				</GroupBox>
+			</StackPanel>
+		</ScrollViewer>
+	</Grid>
+</Window>

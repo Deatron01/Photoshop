@@ -1,0 +1,4 @@
+C:\Users\nipit\source\repos\Photoshop\ImageProcessing.Core\obj\Debug\net8.0\ImageProcessing.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\nipit\source\repos\Photoshop\ImageProcessing.Core\obj\Debug\net8.0\ImageProcessing.Core.AssemblyInfoInputs.cache
+C:\Users\nipit\source\repos\Photoshop\ImageProcessing.Core\obj\Debug\net8.0\ImageProcessing.Core.AssemblyInfo.cs
+C:\Users\nipit\source\repos\Photoshop\ImageProcessing.Core\obj\Debug\net8.0\ImageProcessing.Core.csproj.CoreCompileInputs.cache

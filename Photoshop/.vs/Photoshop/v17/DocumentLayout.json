@@ -1,0 +1,145 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\nipit\\source\\repos\\Photoshop\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{D50C4896-85BD-40B4-9009-037596257789}|Photoshop\\ImageProcessing.WpfApp.csproj|c:\\users\\nipit\\source\\repos\\photoshop\\photoshop\\mainviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D50C4896-85BD-40B4-9009-037596257789}|Photoshop\\ImageProcessing.WpfApp.csproj|solutionrelative:photoshop\\mainviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D50C4896-85BD-40B4-9009-037596257789}|Photoshop\\ImageProcessing.WpfApp.csproj|c:\\users\\nipit\\source\\repos\\photoshop\\photoshop\\resultwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D50C4896-85BD-40B4-9009-037596257789}|Photoshop\\ImageProcessing.WpfApp.csproj|solutionrelative:photoshop\\resultwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{84AC3705-F5AE-46CF-BCD9-8ADA7F10F17D}|ImageProcessing.Core\\ImageProcessing.Core.csproj|c:\\users\\nipit\\source\\repos\\photoshop\\imageprocessing.core\\imageprocessor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{84AC3705-F5AE-46CF-BCD9-8ADA7F10F17D}|ImageProcessing.Core\\ImageProcessing.Core.csproj|solutionrelative:imageprocessing.core\\imageprocessor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{84AC3705-F5AE-46CF-BCD9-8ADA7F10F17D}|ImageProcessing.Core\\ImageProcessing.Core.csproj|c:\\users\\nipit\\source\\repos\\photoshop\\imageprocessing.core\\imageprocessing.core.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{84AC3705-F5AE-46CF-BCD9-8ADA7F10F17D}|ImageProcessing.Core\\ImageProcessing.Core.csproj|solutionrelative:imageprocessing.core\\imageprocessing.core.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D50C4896-85BD-40B4-9009-037596257789}|Photoshop\\ImageProcessing.WpfApp.csproj|c:\\users\\nipit\\source\\repos\\photoshop\\photoshop\\resultwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{D50C4896-85BD-40B4-9009-037596257789}|Photoshop\\ImageProcessing.WpfApp.csproj|solutionrelative:photoshop\\resultwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D50C4896-85BD-40B4-9009-037596257789}|Photoshop\\ImageProcessing.WpfApp.csproj|c:\\users\\nipit\\source\\repos\\photoshop\\photoshop\\resultwindow.xaml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
+      "RelativeMoniker": "D:0:0:{D50C4896-85BD-40B4-9009-037596257789}|Photoshop\\ImageProcessing.WpfApp.csproj|solutionrelative:photoshop\\resultwindow.xaml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D50C4896-85BD-40B4-9009-037596257789}|Photoshop\\ImageProcessing.WpfApp.csproj|c:\\users\\nipit\\source\\repos\\photoshop\\photoshop\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{D50C4896-85BD-40B4-9009-037596257789}|Photoshop\\ImageProcessing.WpfApp.csproj|solutionrelative:photoshop\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 2,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c64b9c2-e352-428e-a56d-0ace190b99a6}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "MainViewModel.cs",
+              "DocumentMoniker": "C:\\Users\\nipit\\source\\repos\\Photoshop\\Photoshop\\MainViewModel.cs",
+              "RelativeDocumentMoniker": "Photoshop\\MainViewModel.cs",
+              "ToolTip": "C:\\Users\\nipit\\source\\repos\\Photoshop\\Photoshop\\MainViewModel.cs",
+              "RelativeToolTip": "Photoshop\\MainViewModel.cs",
+              "ViewState": "AgIAAHAAAAAAAAAAAAD4v3cAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-01T16:04:13.818Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ImageProcessor.cs",
+              "DocumentMoniker": "C:\\Users\\nipit\\source\\repos\\Photoshop\\ImageProcessing.Core\\ImageProcessor.cs",
+              "RelativeDocumentMoniker": "ImageProcessing.Core\\ImageProcessor.cs",
+              "ToolTip": "C:\\Users\\nipit\\source\\repos\\Photoshop\\ImageProcessing.Core\\ImageProcessor.cs",
+              "RelativeToolTip": "ImageProcessing.Core\\ImageProcessor.cs",
+              "ViewState": "AgIAAMIAAAAAAAAAAAAkwBsBAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-01T15:44:55.359Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "ImageProcessing.Core",
+              "DocumentMoniker": "C:\\Users\\nipit\\source\\repos\\Photoshop\\ImageProcessing.Core\\ImageProcessing.Core.csproj",
+              "RelativeDocumentMoniker": "ImageProcessing.Core\\ImageProcessing.Core.csproj",
+              "ToolTip": "C:\\Users\\nipit\\source\\repos\\Photoshop\\ImageProcessing.Core\\ImageProcessing.Core.csproj",
+              "RelativeToolTip": "ImageProcessing.Core\\ImageProcessing.Core.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-03-01T15:44:54.592Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "ResultWindow.xaml",
+              "DocumentMoniker": "C:\\Users\\nipit\\source\\repos\\Photoshop\\Photoshop\\ResultWindow.xaml",
+              "RelativeDocumentMoniker": "Photoshop\\ResultWindow.xaml",
+              "ToolTip": "C:\\Users\\nipit\\source\\repos\\Photoshop\\Photoshop\\ResultWindow.xaml",
+              "RelativeToolTip": "Photoshop\\ResultWindow.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-03-01T15:40:41.172Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "ResultWindow.xaml",
+              "DocumentMoniker": "C:\\Users\\nipit\\source\\repos\\Photoshop\\Photoshop\\ResultWindow.xaml",
+              "RelativeDocumentMoniker": "Photoshop\\ResultWindow.xaml",
+              "ToolTip": "C:\\Users\\nipit\\source\\repos\\Photoshop\\Photoshop\\ResultWindow.xaml",
+              "RelativeToolTip": "Photoshop\\ResultWindow.xaml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAATAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-03-01T15:40:31.511Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "MainWindow.xaml",
+              "DocumentMoniker": "C:\\Users\\nipit\\source\\repos\\Photoshop\\Photoshop\\MainWindow.xaml",
+              "RelativeDocumentMoniker": "Photoshop\\MainWindow.xaml",
+              "ToolTip": "C:\\Users\\nipit\\source\\repos\\Photoshop\\Photoshop\\MainWindow.xaml",
+              "RelativeToolTip": "Photoshop\\MainWindow.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-03-01T15:40:25.168Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ResultWindow.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\nipit\\source\\repos\\Photoshop\\Photoshop\\ResultWindow.xaml.cs",
+              "RelativeDocumentMoniker": "Photoshop\\ResultWindow.xaml.cs",
+              "ToolTip": "C:\\Users\\nipit\\source\\repos\\Photoshop\\Photoshop\\ResultWindow.xaml.cs",
+              "RelativeToolTip": "Photoshop\\ResultWindow.xaml.cs",
+              "ViewState": "AgIAAGIAAAAAAAAAAAAYwLQAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-01T15:39:37.673Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
