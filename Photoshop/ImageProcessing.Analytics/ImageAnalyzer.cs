@@ -22,15 +22,18 @@ namespace ImageProcessing.Analytics
             unsafe
             {
                 byte* ptr = (byte*)data.Scan0;
-                int bytes = data.Stride * height;
-                for (int i = 0; i < bytes; i += 4)
+                for (int y = 0; y < height; y++)
                 {
-                    int gray = (int)(0.299 * ptr[i + 2] + 0.587 * ptr[i + 1] + 0.114 * ptr[i]);
-                    hist[gray]++;
-                    sum += gray;
-                    sumSq += gray * gray;
-                    if (gray < min) min = gray;
-                    if (gray > max) max = gray;
+                    byte* row = ptr + y * data.Stride;
+                    for (int x = 0; x < width * 4; x += 4)
+                    {
+                        int gray = (int)(0.299 * row[x + 2] + 0.587 * row[x + 1] + 0.114 * row[x]);
+                        hist[gray]++;
+                        sum += gray;
+                        sumSq += gray * gray;
+                        if (gray < min) min = gray;
+                        if (gray > max) max = gray;
+                    }
                 }
             }
             bmp.UnlockBits(data);
@@ -65,14 +68,21 @@ namespace ImageProcessing.Analytics
         public static double CalculateEdgePercentage(Bitmap bmp, int threshold = 50)
         {
             int edgeCount = 0;
-            int total = bmp.Width * bmp.Height;
-            BitmapData data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            int width = bmp.Width;
+            int height = bmp.Height;
+            int total = width * height;
+            BitmapData data = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+
             unsafe
             {
                 byte* ptr = (byte*)data.Scan0;
-                for (int i = 0; i < data.Stride * bmp.Height; i += 4)
+                for (int y = 0; y < height; y++)
                 {
-                    if (ptr[i] > threshold) edgeCount++;
+                    byte* row = ptr + y * data.Stride;
+                    for (int x = 0; x < width * 4; x += 4)
+                    {
+                        if (row[x] > threshold) edgeCount++;
+                    }
                 }
             }
             bmp.UnlockBits(data);
@@ -82,17 +92,24 @@ namespace ImageProcessing.Analytics
         public static int CountHarrisKeypoints(Bitmap resultBmp)
         {
             int count = 0;
-            BitmapData data = resultBmp.LockBits(new Rectangle(0, 0, resultBmp.Width, resultBmp.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            int width = resultBmp.Width;
+            int height = resultBmp.Height;
+            BitmapData data = resultBmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+
             unsafe
             {
                 byte* ptr = (byte*)data.Scan0;
-                for (int i = 0; i < data.Stride * resultBmp.Height; i += 4)
-                { 
-                    if (ptr[i] == 0 && ptr[i + 1] == 0 && ptr[i + 2] == 255) count++;
+                for (int y = 0; y < height; y++)
+                {
+                    byte* row = ptr + y * data.Stride;
+                    for (int x = 0; x < width * 4; x += 4)
+                    {
+                        if (row[x] == 0 && row[x + 1] == 0 && row[x + 2] == 255) count++;
+                    }
                 }
             }
             resultBmp.UnlockBits(data);
-            return count;
+            return count / 9;
         }
     }
 }

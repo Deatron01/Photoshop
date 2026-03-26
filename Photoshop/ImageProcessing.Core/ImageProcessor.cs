@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
@@ -55,17 +56,21 @@ namespace ImageProcessing.Core
             unsafe
             {
                 byte* ptr = (byte*)data.Scan0;
-                int bytes = data.Stride * height;
-                for (int i = 0; i < bytes; i += 4)
+                for (int y = 0; y < height; y++)
                 {
-                    int gray = (int)(0.299 * ptr[i + 2] + 0.587 * ptr[i + 1] + 0.114 * ptr[i]);
-                    hist[gray]++;
+                    byte* row = ptr + y * data.Stride;
+                    for (int x = 0; x < width * 4; x += 4)
+                    {
+                        int gray = (int)(0.299 * row[x + 2] + 0.587 * row[x + 1] + 0.114 * row[x]);
+                        hist[gray]++;
+                    }
                 }
             }
             source.UnlockBits(data);
 
             return DrawHistogram(hist);
         }
+
         public static Bitmap HistogramEqualization(Bitmap source)
         {
             int[] hist = new int[256];
@@ -77,13 +82,17 @@ namespace ImageProcessing.Core
             unsafe
             {
                 byte* ptr = (byte*)srcData.Scan0;
-                int bytes = srcData.Stride * height;
-                for (int i = 0; i < bytes; i += 4)
+                for (int y = 0; y < height; y++)
                 {
-                    int gray = (int)(0.299 * ptr[i + 2] + 0.587 * ptr[i + 1] + 0.114 * ptr[i]);
-                    hist[gray]++;
+                    byte* row = ptr + y * srcData.Stride;
+                    for (int x = 0; x < width * 4; x += 4)
+                    {
+                        int gray = (int)(0.299 * row[x + 2] + 0.587 * row[x + 1] + 0.114 * row[x]);
+                        hist[gray]++;
+                    }
                 }
             }
+
             int[] cdf = new int[256];
             cdf[0] = hist[0];
             for (int i = 1; i < 256; i++) cdf[i] = cdf[i - 1] + hist[i];
@@ -110,7 +119,10 @@ namespace ImageProcessing.Core
                     {
                         byte gray = (byte)(0.299 * srcRow[x + 2] + 0.587 * srcRow[x + 1] + 0.114 * srcRow[x]);
                         byte eq = lut[gray];
-                        dstRow[x] = eq; dstRow[x + 1] = eq; dstRow[x + 2] = eq; dstRow[x + 3] = 255;
+                        dstRow[x] = eq;
+                        dstRow[x + 1] = eq;
+                        dstRow[x + 2] = eq;
+                        dstRow[x + 3] = srcRow[x + 3];
                     }
                 });
             }
@@ -167,6 +179,7 @@ namespace ImageProcessing.Core
                 });
             }
             grayImg.UnlockBits(srcData);
+
             double[] rMap = new double[w * h];
             double maxR = 0;
             double k = 0.04;
@@ -208,56 +221,63 @@ namespace ImageProcessing.Core
             double dynamicThreshold = maxR * 0.01;
             if (dynamicThreshold < 100000) dynamicThreshold = 100000;
 
+            var keypoints = new ConcurrentBag<(int X, int Y)>();
+
+            Parallel.For(3, h - 3, y =>
+            {
+                for (int x = 3; x < w - 3; x++)
+                {
+                    int pIdx = y * w + x;
+                    double r = rMap[pIdx];
+
+                    if (r > dynamicThreshold)
+                    {
+                        bool isLocalMax = true;
+                        for (int wy = -1; wy <= 1; wy++)
+                        {
+                            for (int wx = -1; wx <= 1; wx++)
+                            {
+                                if (wx == 0 && wy == 0) continue;
+                                if (rMap[(y + wy) * w + (x + wx)] > r)
+                                {
+                                    isLocalMax = false;
+                                    break;
+                                }
+                            }
+                            if (!isLocalMax) break;
+                        }
+
+                        if (isLocalMax)
+                        {
+                            keypoints.Add((x, y));
+                        }
+                    }
+                }
+            });
+
             unsafe
             {
                 byte* dst = (byte*)dstData.Scan0;
-
-                Parallel.For(3, h - 3, y =>
+                foreach (var kp in keypoints)
                 {
-                    for (int x = 3; x < w - 3; x++)
+                    for (int dy = -1; dy <= 1; dy++)
                     {
-                        int pIdx = y * w + x;
-                        double r = rMap[pIdx];
-
-                        if (r > dynamicThreshold)
+                        for (int dx = -1; dx <= 1; dx++)
                         {
-                            bool isLocalMax = true;
-
-                            for (int wy = -1; wy <= 1; wy++)
-                            {
-                                for (int wx = -1; wx <= 1; wx++)
-                                {
-                                    if (wx == 0 && wy == 0) continue;
-                                    if (rMap[(y + wy) * w + (x + wx)] > r)
-                                    {
-                                        isLocalMax = false;
-                                        break;
-                                    }
-                                }
-                                if (!isLocalMax) break;
-                            }
-
-                            if (isLocalMax)
-                            {
-
-                                for (int dy = -1; dy <= 1; dy++)
-                                {
-                                    for (int dx = -1; dx <= 1; dx++)
-                                    {
-                                        int drawIdx = (y + dy) * stride + (x + dx) * 4;
-                                        dst[drawIdx] = 0;       
-                                        dst[drawIdx + 1] = 0;   
-                                        dst[drawIdx + 2] = 255;
-                                    }
-                                }
-                            }
+                            int drawIdx = (kp.Y + dy) * dstData.Stride + (kp.X + dx) * 4;
+                            dst[drawIdx] = 0;
+                            dst[drawIdx + 1] = 0;
+                            dst[drawIdx + 2] = 255;
+                            dst[drawIdx + 3] = 255; 
                         }
                     }
-                });
+                }
             }
+
             result.UnlockBits(dstData);
             return result;
         }
+
         private static Bitmap ProcessPointOp(Bitmap source, Func<byte, byte, byte, (byte r, byte g, byte b)> operation)
         {
             int width = source.Width;
@@ -273,7 +293,7 @@ namespace ImageProcessing.Core
                 byte* dstPtr = (byte*)dstData.Scan0;
 
                 Parallel.For(0, height, y =>
-                { 
+                {
                     Span<byte> srcRow = new Span<byte>(srcPtr + y * srcData.Stride, srcData.Stride);
                     Span<byte> dstRow = new Span<byte>(dstPtr + y * dstData.Stride, dstData.Stride);
 
@@ -329,7 +349,7 @@ namespace ImageProcessing.Core
                         dst[dstIdx] = (byte)Math.Clamp(b * factor, 0, 255);
                         dst[dstIdx + 1] = (byte)Math.Clamp(g * factor, 0, 255);
                         dst[dstIdx + 2] = (byte)Math.Clamp(r * factor, 0, 255);
-                        dst[dstIdx + 3] = 255;
+                        dst[dstIdx + 3] = src[dstIdx + 3];
                     }
                 });
             }
@@ -374,7 +394,7 @@ namespace ImageProcessing.Core
                         dst[dstIdx] = (byte)Math.Clamp(Math.Sqrt(bx * bx + by * by), 0, 255);
                         dst[dstIdx + 1] = (byte)Math.Clamp(Math.Sqrt(gx * gx + gy * gy), 0, 255);
                         dst[dstIdx + 2] = (byte)Math.Clamp(Math.Sqrt(rx * rx + ry * ry), 0, 255);
-                        dst[dstIdx + 3] = 255;
+                        dst[dstIdx + 3] = src[dstIdx + 3];
                     }
                 });
             }

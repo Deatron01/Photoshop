@@ -53,7 +53,7 @@ namespace ImageProcessing.WpfApp
             LoadImageCommand = new RelayCommand(_ => LoadImage());
 
             NegationCommand = new RelayCommand(_ => ExecuteFilter(
-                "Image Negation", "O(x,y) = 255 - I(x,y)", "None", ImageProcessor.Negate));
+                "Image Negation", "O(x,y) = 255 - I(x,y)", "None", ImageProcessor.Negate), CanExecuteFilter);
 
             GammaCommand = new RelayCommand(_ => ExecuteFilter(
                 "Gamma Correction", "O(x,y) = 255 * (I(x,y)/255)^γ", $"Gamma = {GammaValue}",
@@ -61,7 +61,7 @@ namespace ImageProcessing.WpfApp
                 analytics => {
                     analytics.CurvePoints = new double[256];
                     for (int i = 0; i < 256; i++) analytics.CurvePoints[i] = Math.Pow(i / 255.0, GammaValue) * 255.0;
-                }));
+                }), CanExecuteFilter);
 
             LogCommand = new RelayCommand(_ => ExecuteFilter(
                 "Logarithmic Transform", "O(x,y) = c * log(1 + I(x,y))", "c = 255 / log(256)",
@@ -70,16 +70,18 @@ namespace ImageProcessing.WpfApp
                     analytics.CurvePoints = new double[256];
                     double c = 255.0 / Math.Log(256);
                     for (int i = 0; i < 256; i++) analytics.CurvePoints[i] = c * Math.Log(1 + i);
-                }));
+                }), CanExecuteFilter);
 
             GrayscaleCommand = new RelayCommand(_ => ExecuteFilter(
-                "Grayscale Conversion", "O(x,y) = 0.299R + 0.587G + 0.114B", "None", ImageProcessor.ToGrayscale));
+                "Grayscale Conversion", "O(x,y) = 0.299R + 0.587G + 0.114B", "None", ImageProcessor.ToGrayscale), CanExecuteFilter);
+
             HistogramCommand = new RelayCommand(_ => ExecuteFilter(
                     "Image Histogram Analytics",
                     "Intensity Distribution",
                     "None",
                     bmp => (Bitmap)bmp.Clone()
-                ));
+                ), CanExecuteFilter);
+
             HistogramEqCommand = new RelayCommand(_ => ExecuteFilter(
                 "Histogram Equalization", "O(x,y) = round( CDF(I(x,y)) / N * 255 )", "None",
                 ImageProcessor.HistogramEqualization,
@@ -93,15 +95,15 @@ namespace ImageProcessing.WpfApp
                         sum += analytics.OriginalHistogram[i];
                         analytics.CDF[i] = sum / (double)(original.Width * original.Height);
                     }
-                }));
+                }), CanExecuteFilter);
 
             BoxFilterCommand = new RelayCommand(_ => ExecuteFilter(
                 "Box Filter (Blur)", "Convolution (Mean)", "Kernel: 3x3, Factor: 1/9", ImageProcessor.BoxFilter,
-                analytics => analytics.KernelMatrix = new double[,] { { 1 / 9.0, 1 / 9.0, 1 / 9.0 }, { 1 / 9.0, 1 / 9.0, 1 / 9.0 }, { 1 / 9.0, 1 / 9.0, 1 / 9.0 } }));
+                analytics => analytics.KernelMatrix = new double[,] { { 1 / 9.0, 1 / 9.0, 1 / 9.0 }, { 1 / 9.0, 1 / 9.0, 1 / 9.0 }, { 1 / 9.0, 1 / 9.0, 1 / 9.0 } }), CanExecuteFilter);
 
             GaussianFilterCommand = new RelayCommand(_ => ExecuteFilter(
                 "Gaussian Filter", "Convolution (Gaussian)", "Kernel: 3x3, Factor: 1/16", ImageProcessor.GaussianFilter,
-                analytics => analytics.KernelMatrix = new double[,] { { 1 / 16.0, 2 / 16.0, 1 / 16.0 }, { 2 / 16.0, 4 / 16.0, 2 / 16.0 }, { 1 / 16.0, 2 / 16.0, 1 / 16.0 } }));
+                analytics => analytics.KernelMatrix = new double[,] { { 1 / 16.0, 2 / 16.0, 1 / 16.0 }, { 2 / 16.0, 4 / 16.0, 2 / 16.0 }, { 1 / 16.0, 2 / 16.0, 1 / 16.0 } }), CanExecuteFilter);
 
             SobelCommand = new RelayCommand(_ => ExecuteFilter(
                 "Sobel Edge Detection", "O(x,y) = sqrt(Gx^2 + Gy^2)", "Kernel: 3x3 Sobel", ImageProcessor.Sobel,
@@ -109,21 +111,21 @@ namespace ImageProcessing.WpfApp
                     analytics.KernelMatrixX = new double[,] { { -1, 0, 1 }, { -2, 0, 2 }, { -1, 0, 1 } };
                     analytics.KernelMatrixY = new double[,] { { 1, 2, 1 }, { 0, 0, 0 }, { -1, -2, -1 } };
                     analytics.EdgePixelPercentage = ImageAnalyzer.CalculateEdgePercentage(result);
-                }));
+                }), CanExecuteFilter);
 
             LaplaceCommand = new RelayCommand(_ => ExecuteFilter(
                 "Laplace Edge Detection", "Convolution (2nd Derivative)", "Kernel: 3x3 Laplace", ImageProcessor.Laplace,
                 (analytics, original, result) => {
                     analytics.KernelMatrix = new double[,] { { 0, 1, 0 }, { 1, -4, 1 }, { 0, 1, 0 } };
                     analytics.EdgePixelPercentage = ImageAnalyzer.CalculateEdgePercentage(result);
-                }));
+                }), CanExecuteFilter);
 
             HarrisCommand = new RelayCommand(_ => ExecuteFilter(
                 "Harris Corner Detection", "R = Det(M) - k*Trace(M)^2", "k = 0.04, Threshold = 10,000,000", ImageProcessor.HarrisCorners,
                 (analytics, original, result) => {
                     analytics.KeypointsDetected = ImageAnalyzer.CountHarrisKeypoints(result);
                     analytics.HarrisThreshold = 10000000;
-                }));
+                }), CanExecuteFilter);
         }
 
         private void LoadImage()
@@ -131,6 +133,8 @@ namespace ImageProcessing.WpfApp
             var dlg = new OpenFileDialog { Filter = "Image Files|*.jpg;*.jpeg;*.png;*.bmp" };
             if (dlg.ShowDialog() == true)
             {
+                _originalBitmap?.Dispose();
+
                 _originalBitmap = new Bitmap(dlg.FileName);
                 DisplayImage = BitmapToImageSource(_originalBitmap);
             }
@@ -165,14 +169,17 @@ namespace ImageProcessing.WpfApp
 
             specificPopulator?.Invoke(analytics, _originalBitmap, resultBmp);
 
-            var resultWindow = new ResultWindow(BitmapToImageSource(resultBmp), analytics);
+            var resultImageSource = BitmapToImageSource(resultBmp);
+            var resultWindow = new ResultWindow(resultImageSource, analytics);
             resultWindow.Show();
+
+            resultBmp.Dispose();
         }
 
         private static BitmapImage BitmapToImageSource(Bitmap bitmap)
         {
             using var memory = new MemoryStream();
-            bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Png);
+            bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);
             memory.Position = 0;
             var bitmapImage = new BitmapImage();
             bitmapImage.BeginInit();
