@@ -10,3 +10,16 @@ C:\Users\nipit\source\repos\Photoshop\ImageProcessing.Core\obj\Debug\net8.0-wind
 C:\Users\nipit\source\repos\Photoshop\ImageProcessing.Core\obj\Debug\net8.0-windows\refint\ImageProcessing.Core.dll
 C:\Users\nipit\source\repos\Photoshop\ImageProcessing.Core\obj\Debug\net8.0-windows\ImageProcessing.Core.pdb
 C:\Users\nipit\source\repos\Photoshop\ImageProcessing.Core\obj\Debug\net8.0-windows\ref\ImageProcessing.Core.dll
+C:\Users\nipit\OneDrive\Desktop\Photoshop\Photoshop\ImageProcessing.Core\bin\Debug\net8.0-windows\ImageProcessing.Core.deps.json
+C:\Users\nipit\OneDrive\Desktop\Photoshop\Photoshop\ImageProcessing.Core\bin\Debug\net8.0-windows\ImageProcessing.Core.dll
+C:\Users\nipit\OneDrive\Desktop\Photoshop\Photoshop\ImageProcessing.Core\bin\Debug\net8.0-windows\ImageProcessing.Core.pdb
+C:\Users\nipit\OneDrive\Desktop\Photoshop\Photoshop\ImageProcessing.Core\obj\Debug\net8.0-windows\ImageProcessing.Core.csproj.AssemblyReference.cache
+C:\Users\nipit\OneDrive\Desktop\Photoshop\Photoshop\ImageProcessing.Core\obj\Debug\net8.0-windows\ImageProcessing.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\nipit\OneDrive\Desktop\Photoshop\Photoshop\ImageProcessing.Core\obj\Debug\net8.0-windows\ImageProcessing.Core.AssemblyInfoInputs.cache
+C:\Users\nipit\OneDrive\Desktop\Photoshop\Photoshop\ImageProcessing.Core\obj\Debug\net8.0-windows\ImageProcessing.Core.AssemblyInfo.cs
+C:\Users\nipit\OneDrive\Desktop\Photoshop\Photoshop\ImageProcessing.Core\obj\Debug\net8.0-windows\ImageProcessing.Core.csproj.CoreCompileInputs.cache
+C:\Users\nipit\OneDrive\Desktop\Photoshop\Photoshop\ImageProcessing.Core\obj\Debug\net8.0-windows\ImageProcessing.Core.sourcelink.json
+C:\Users\nipit\OneDrive\Desktop\Photoshop\Photoshop\ImageProcessing.Core\obj\Debug\net8.0-windows\ImageProcessing.Core.dll
+C:\Users\nipit\OneDrive\Desktop\Photoshop\Photoshop\ImageProcessing.Core\obj\Debug\net8.0-windows\refint\ImageProcessing.Core.dll
+C:\Users\nipit\OneDrive\Desktop\Photoshop\Photoshop\ImageProcessing.Core\obj\Debug\net8.0-windows\ImageProcessing.Core.pdb
+C:\Users\nipit\OneDrive\Desktop\Photoshop\Photoshop\ImageProcessing.Core\obj\Debug\net8.0-windows\ref\ImageProcessing.Core.dll

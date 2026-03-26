@@ -134,11 +134,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\nipit\\source\\repos\\Photoshop\\ImageProcessing.Analytics\\ImageProcessing.Analytics.csproj",
+      "projectUniqueName": "C:\\Users\\nipit\\OneDrive\\Desktop\\Photoshop\\Photoshop\\ImageProcessing.Analytics\\ImageProcessing.Analytics.csproj",
       "projectName": "ImageProcessing.Analytics",
-      "projectPath": "C:\\Users\\nipit\\source\\repos\\Photoshop\\ImageProcessing.Analytics\\ImageProcessing.Analytics.csproj",
+      "projectPath": "C:\\Users\\nipit\\OneDrive\\Desktop\\Photoshop\\Photoshop\\ImageProcessing.Analytics\\ImageProcessing.Analytics.csproj",
       "packagesPath": "C:\\Users\\nipit\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\nipit\\source\\repos\\Photoshop\\ImageProcessing.Analytics\\obj\\",
+      "outputPath": "C:\\Users\\nipit\\OneDrive\\Desktop\\Photoshop\\Photoshop\\ImageProcessing.Analytics\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -172,7 +172,7 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "9.0.300"
+      "SdkAnalysisLevel": "10.0.200"
     },
     "frameworks": {
       "net8.0-windows7.0": {
@@ -202,7 +202,7 @@
             "privateAssets": "none"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.300/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.201/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

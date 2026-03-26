@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "TIbOZHcBeWA=",
+  "dgSpecHash": "Ybw42sEf6pQ=",
   "success": true,
-  "projectFilePath": "C:\\Users\\nipit\\source\\repos\\Photoshop\\ImageProcessing.Core\\ImageProcessing.Core.csproj",
+  "projectFilePath": "C:\\Users\\nipit\\OneDrive\\Desktop\\Photoshop\\Photoshop\\ImageProcessing.Core\\ImageProcessing.Core.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\nipit\\.nuget\\packages\\microsoft.win32.systemevents\\8.0.0\\microsoft.win32.systemevents.8.0.0.nupkg.sha512",
     "C:\\Users\\nipit\\.nuget\\packages\\system.drawing.common\\8.0.0\\system.drawing.common.8.0.0.nupkg.sha512"

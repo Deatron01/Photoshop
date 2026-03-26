@@ -10,3 +10,16 @@ C:\Users\nipit\source\repos\Photoshop\ImageProcessing.Analytics\obj\Debug\net8.0
 C:\Users\nipit\source\repos\Photoshop\ImageProcessing.Analytics\obj\Debug\net8.0-windows\refint\ImageProcessing.Analytics.dll
 C:\Users\nipit\source\repos\Photoshop\ImageProcessing.Analytics\obj\Debug\net8.0-windows\ImageProcessing.Analytics.pdb
 C:\Users\nipit\source\repos\Photoshop\ImageProcessing.Analytics\obj\Debug\net8.0-windows\ref\ImageProcessing.Analytics.dll
+C:\Users\nipit\OneDrive\Desktop\Photoshop\Photoshop\ImageProcessing.Analytics\bin\Debug\net8.0-windows\ImageProcessing.Analytics.deps.json
+C:\Users\nipit\OneDrive\Desktop\Photoshop\Photoshop\ImageProcessing.Analytics\bin\Debug\net8.0-windows\ImageProcessing.Analytics.dll
+C:\Users\nipit\OneDrive\Desktop\Photoshop\Photoshop\ImageProcessing.Analytics\bin\Debug\net8.0-windows\ImageProcessing.Analytics.pdb
+C:\Users\nipit\OneDrive\Desktop\Photoshop\Photoshop\ImageProcessing.Analytics\obj\Debug\net8.0-windows\ImageProcessing.Analytics.csproj.AssemblyReference.cache
+C:\Users\nipit\OneDrive\Desktop\Photoshop\Photoshop\ImageProcessing.Analytics\obj\Debug\net8.0-windows\ImageProcessing.Analytics.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\nipit\OneDrive\Desktop\Photoshop\Photoshop\ImageProcessing.Analytics\obj\Debug\net8.0-windows\ImageProcessing.Analytics.AssemblyInfoInputs.cache
+C:\Users\nipit\OneDrive\Desktop\Photoshop\Photoshop\ImageProcessing.Analytics\obj\Debug\net8.0-windows\ImageProcessing.Analytics.AssemblyInfo.cs
+C:\Users\nipit\OneDrive\Desktop\Photoshop\Photoshop\ImageProcessing.Analytics\obj\Debug\net8.0-windows\ImageProcessing.Analytics.csproj.CoreCompileInputs.cache
+C:\Users\nipit\OneDrive\Desktop\Photoshop\Photoshop\ImageProcessing.Analytics\obj\Debug\net8.0-windows\ImageProcessing.Analytics.sourcelink.json
+C:\Users\nipit\OneDrive\Desktop\Photoshop\Photoshop\ImageProcessing.Analytics\obj\Debug\net8.0-windows\ImageProcessing.Analytics.dll
+C:\Users\nipit\OneDrive\Desktop\Photoshop\Photoshop\ImageProcessing.Analytics\obj\Debug\net8.0-windows\refint\ImageProcessing.Analytics.dll
+C:\Users\nipit\OneDrive\Desktop\Photoshop\Photoshop\ImageProcessing.Analytics\obj\Debug\net8.0-windows\ImageProcessing.Analytics.pdb
+C:\Users\nipit\OneDrive\Desktop\Photoshop\Photoshop\ImageProcessing.Analytics\obj\Debug\net8.0-windows\ref\ImageProcessing.Analytics.dll
