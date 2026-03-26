@@ -41,56 +41,76 @@ namespace ImageProcessing.Core
         {
             return ProcessPointOp(source, (r, g, b) =>
             {
-                byte gray = (byte)(0.299 * r + 0.587 * g + 0.114 * b);
+
+                byte gray = (byte)((r * 77 + g * 150 + b * 29) >> 8);
                 return (gray, gray, gray);
             });
         }
 
         public static Bitmap GetHistogram(Bitmap source)
         {
-            int[] hist = new int[256];
             int width = source.Width;
             int height = source.Height;
+            int[] globalHist = new int[256];
+            object histLock = new object();
 
             BitmapData data = source.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
             unsafe
             {
                 byte* ptr = (byte*)data.Scan0;
-                for (int y = 0; y < height; y++)
-                {
-                    byte* row = ptr + y * data.Stride;
-                    for (int x = 0; x < width * 4; x += 4)
+
+                Parallel.For(0, height,
+                    () => new int[256],
+                    (y, loop, localHist) =>
                     {
-                        int gray = (int)(0.299 * row[x + 2] + 0.587 * row[x + 1] + 0.114 * row[x]);
-                        hist[gray]++;
-                    }
-                }
+                        byte* row = ptr + y * data.Stride;
+                        for (int x = 0; x < width * 4; x += 4)
+                        {
+                            int gray = (row[x + 2] * 77 + row[x + 1] * 150 + row[x] * 29) >> 8;
+                            localHist[gray]++;
+                        }
+                        return localHist;
+                    },
+                    (localHist) =>
+                    {
+                        lock (histLock) { for (int i = 0; i < 256; i++) globalHist[i] += localHist[i]; }
+                    });
             }
             source.UnlockBits(data);
 
-            return DrawHistogram(hist);
+            return DrawHistogram(globalHist);
         }
 
         public static Bitmap HistogramEqualization(Bitmap source)
         {
-            int[] hist = new int[256];
             int width = source.Width;
             int height = source.Height;
             int totalPixels = width * height;
+
+            int[] hist = new int[256];
+            object histLock = new object();
 
             BitmapData srcData = source.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
             unsafe
             {
                 byte* ptr = (byte*)srcData.Scan0;
-                for (int y = 0; y < height; y++)
-                {
-                    byte* row = ptr + y * srcData.Stride;
-                    for (int x = 0; x < width * 4; x += 4)
+
+                Parallel.For(0, height,
+                    () => new int[256],
+                    (y, loop, localHist) =>
                     {
-                        int gray = (int)(0.299 * row[x + 2] + 0.587 * row[x + 1] + 0.114 * row[x]);
-                        hist[gray]++;
-                    }
-                }
+                        byte* row = ptr + y * srcData.Stride;
+                        for (int x = 0; x < width * 4; x += 4)
+                        {
+                            int gray = (row[x + 2] * 77 + row[x + 1] * 150 + row[x] * 29) >> 8;
+                            localHist[gray]++;
+                        }
+                        return localHist;
+                    },
+                    (localHist) =>
+                    {
+                        lock (histLock) { for (int i = 0; i < 256; i++) hist[i] += localHist[i]; }
+                    });
             }
 
             int[] cdf = new int[256];
@@ -117,7 +137,7 @@ namespace ImageProcessing.Core
 
                     for (int x = 0; x < width * 4; x += 4)
                     {
-                        byte gray = (byte)(0.299 * srcRow[x + 2] + 0.587 * srcRow[x + 1] + 0.114 * srcRow[x]);
+                        byte gray = (byte)((srcRow[x + 2] * 77 + srcRow[x + 1] * 150 + srcRow[x] * 29) >> 8);
                         byte eq = lut[gray];
                         dstRow[x] = eq;
                         dstRow[x + 1] = eq;
@@ -131,18 +151,176 @@ namespace ImageProcessing.Core
             return result;
         }
 
-        public static Bitmap BoxFilter(Bitmap source) => Convolve(source, new double[,] { { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 } }, 1.0 / 9.0);
+        public static Bitmap BoxFilter(Bitmap source)
+            => ConvolveSeparable(source, new double[] { 1, 1, 1 }, 1.0 / 3.0);
 
-        public static Bitmap GaussianFilter(Bitmap source) => Convolve(source, new double[,] { { 1, 2, 1 }, { 2, 4, 2 }, { 1, 2, 1 } }, 1.0 / 16.0);
+        public static Bitmap GaussianFilter(Bitmap source)
+            => ConvolveSeparable(source, new double[] { 1, 2, 1 }, 1.0 / 4.0);
 
         public static Bitmap Sobel(Bitmap source)
         {
             double[,] gx = { { -1, 0, 1 }, { -2, 0, 2 }, { -1, 0, 1 } };
             double[,] gy = { { 1, 2, 1 }, { 0, 0, 0 }, { -1, -2, -1 } };
-            return ConvolveMagnitude(source, gx, gy);
+
+            int w = source.Width;
+            int h = source.Height;
+            Bitmap result = new Bitmap(w, h, PixelFormat.Format32bppArgb);
+            BitmapData srcData = source.LockBits(new Rectangle(0, 0, w, h), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            BitmapData dstData = result.LockBits(new Rectangle(0, 0, w, h), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+
+            unsafe
+            {
+                byte* src = (byte*)srcData.Scan0;
+                byte* dst = (byte*)dstData.Scan0;
+                int stride = srcData.Stride;
+
+                Parallel.For(1, h - 1, y =>
+                {
+                    for (int x = 1; x < w - 1; x++)
+                    {
+                        double rx = 0, gx_val = 0, bx = 0;
+                        double ry = 0, gy_val = 0, by = 0;
+
+                        for (int fY = -1; fY <= 1; fY++)
+                        {
+                            for (int fX = -1; fX <= 1; fX++)
+                            {
+                                int idx = (y + fY) * stride + (x + fX) * 4;
+                                bx += src[idx] * gx[fY + 1, fX + 1]; by += src[idx] * gy[fY + 1, fX + 1];
+                                gx_val += src[idx + 1] * gx[fY + 1, fX + 1]; gy_val += src[idx + 1] * gy[fY + 1, fX + 1];
+                                rx += src[idx + 2] * gx[fY + 1, fX + 1]; ry += src[idx + 2] * gy[fY + 1, fX + 1];
+                            }
+                        }
+
+                        int dstIdx = y * stride + x * 4;
+                        dst[dstIdx] = (byte)Math.Clamp(Math.Abs(bx) + Math.Abs(by), 0, 255);
+                        dst[dstIdx + 1] = (byte)Math.Clamp(Math.Abs(gx_val) + Math.Abs(gy_val), 0, 255);
+                        dst[dstIdx + 2] = (byte)Math.Clamp(Math.Abs(rx) + Math.Abs(ry), 0, 255);
+                        dst[dstIdx + 3] = src[dstIdx + 3];
+                    }
+                });
+            }
+            source.UnlockBits(srcData);
+            result.UnlockBits(dstData);
+            return result;
         }
 
-        public static Bitmap Laplace(Bitmap source) => Convolve(source, new double[,] { { 0, 1, 0 }, { 1, -4, 1 }, { 0, 1, 0 } }, 1.0);
+        public static Bitmap Laplace(Bitmap source)
+            => Convolve2D(source, new double[,] { { 0, 1, 0 }, { 1, -4, 1 }, { 0, 1, 0 } }, 1.0);
+
+        private static Bitmap ConvolveSeparable(Bitmap source, double[] kernel1D, double factor)
+        {
+            int w = source.Width;
+            int h = source.Height;
+            Bitmap result = new Bitmap(w, h, PixelFormat.Format32bppArgb);
+            BitmapData srcData = source.LockBits(new Rectangle(0, 0, w, h), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            BitmapData dstData = result.LockBits(new Rectangle(0, 0, w, h), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+
+            byte[] tempBuffer = new byte[h * dstData.Stride];
+            GCHandle tempHandle = GCHandle.Alloc(tempBuffer, GCHandleType.Pinned);
+
+            unsafe
+            {
+                byte* src = (byte*)srcData.Scan0;
+                byte* dst = (byte*)dstData.Scan0;
+                byte* tempPtr = (byte*)tempHandle.AddrOfPinnedObject();
+                int stride = srcData.Stride;
+                int kRadius = kernel1D.Length / 2;
+
+                Parallel.For(0, h, y =>
+                {
+                    for (int x = kRadius; x < w - kRadius; x++)
+                    {
+                        double b = 0, g = 0, r = 0;
+                        for (int k = -kRadius; k <= kRadius; k++)
+                        {
+                            int idx = y * stride + (x + k) * 4;
+                            double weight = kernel1D[k + kRadius];
+                            b += src[idx] * weight;
+                            g += src[idx + 1] * weight;
+                            r += src[idx + 2] * weight;
+                        }
+                        int tempIdx = y * stride + x * 4;
+                        tempPtr[tempIdx] = (byte)Math.Clamp(b * factor, 0, 255);
+                        tempPtr[tempIdx + 1] = (byte)Math.Clamp(g * factor, 0, 255);
+                        tempPtr[tempIdx + 2] = (byte)Math.Clamp(r * factor, 0, 255);
+                        tempPtr[tempIdx + 3] = src[tempIdx + 3];
+                    }
+                });
+
+                Parallel.For(kRadius, h - kRadius, y =>
+                {
+                    for (int x = kRadius; x < w - kRadius; x++)
+                    {
+                        double b = 0, g = 0, r = 0;
+                        for (int k = -kRadius; k <= kRadius; k++)
+                        {
+                            int idx = (y + k) * stride + x * 4;
+                            double weight = kernel1D[k + kRadius];
+                            b += tempPtr[idx] * weight;
+                            g += tempPtr[idx + 1] * weight;
+                            r += tempPtr[idx + 2] * weight;
+                        }
+                        int dstIdx = y * stride + x * 4;
+                        dst[dstIdx] = (byte)Math.Clamp(b * factor, 0, 255);
+                        dst[dstIdx + 1] = (byte)Math.Clamp(g * factor, 0, 255);
+                        dst[dstIdx + 2] = (byte)Math.Clamp(r * factor, 0, 255);
+                        dst[dstIdx + 3] = tempPtr[dstIdx + 3];
+                    }
+                });
+            }
+
+            tempHandle.Free();
+
+            source.UnlockBits(srcData);
+            result.UnlockBits(dstData);
+            return result;
+        }
+
+        private static Bitmap Convolve2D(Bitmap source, double[,] kernel, double factor)
+        {
+            int w = source.Width;
+            int h = source.Height;
+            Bitmap result = new Bitmap(w, h, PixelFormat.Format32bppArgb);
+            BitmapData srcData = source.LockBits(new Rectangle(0, 0, w, h), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            BitmapData dstData = result.LockBits(new Rectangle(0, 0, w, h), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+
+            unsafe
+            {
+                byte* src = (byte*)srcData.Scan0;
+                byte* dst = (byte*)dstData.Scan0;
+                int stride = srcData.Stride;
+
+                Parallel.For(1, h - 1, y =>
+                {
+                    for (int x = 1; x < w - 1; x++)
+                    {
+                        double r = 0.0, g = 0.0, b = 0.0;
+
+                        for (int ky = -1; ky <= 1; ky++)
+                        {
+                            for (int kx = -1; kx <= 1; kx++)
+                            {
+                                int idx = (y + ky) * stride + (x + kx) * 4;
+                                double weight = kernel[ky + 1, kx + 1];
+                                b += src[idx] * weight;
+                                g += src[idx + 1] * weight;
+                                r += src[idx + 2] * weight;
+                            }
+                        }
+
+                        int dstIdx = y * stride + x * 4;
+                        dst[dstIdx] = (byte)Math.Clamp(b * factor, 0, 255);
+                        dst[dstIdx + 1] = (byte)Math.Clamp(g * factor, 0, 255);
+                        dst[dstIdx + 2] = (byte)Math.Clamp(r * factor, 0, 255);
+                        dst[dstIdx + 3] = src[dstIdx + 3];
+                    }
+                });
+            }
+            source.UnlockBits(srcData);
+            result.UnlockBits(dstData);
+            return result;
+        }
 
         public static Bitmap HarrisCorners(Bitmap source)
         {
@@ -268,7 +446,7 @@ namespace ImageProcessing.Core
                             dst[drawIdx] = 0;
                             dst[drawIdx + 1] = 0;
                             dst[drawIdx + 2] = 255;
-                            dst[drawIdx + 3] = 255; 
+                            dst[drawIdx + 3] = 255;
                         }
                     }
                 }
@@ -308,96 +486,6 @@ namespace ImageProcessing.Core
                 });
             }
 
-            source.UnlockBits(srcData);
-            result.UnlockBits(dstData);
-            return result;
-        }
-
-        private static Bitmap Convolve(Bitmap source, double[,] kernel, double factor)
-        {
-            int w = source.Width;
-            int h = source.Height;
-            Bitmap result = new Bitmap(w, h, PixelFormat.Format32bppArgb);
-            BitmapData srcData = source.LockBits(new Rectangle(0, 0, w, h), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
-            BitmapData dstData = result.LockBits(new Rectangle(0, 0, w, h), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
-
-            unsafe
-            {
-                byte* src = (byte*)srcData.Scan0;
-                byte* dst = (byte*)dstData.Scan0;
-                int stride = srcData.Stride;
-
-                Parallel.For(1, h - 1, y =>
-                {
-                    for (int x = 1; x < w - 1; x++)
-                    {
-                        double r = 0.0, g = 0.0, b = 0.0;
-
-                        for (int ky = -1; ky <= 1; ky++)
-                        {
-                            for (int kx = -1; kx <= 1; kx++)
-                            {
-                                int idx = (y + ky) * stride + (x + kx) * 4;
-                                double weight = kernel[ky + 1, kx + 1];
-                                b += src[idx] * weight;
-                                g += src[idx + 1] * weight;
-                                r += src[idx + 2] * weight;
-                            }
-                        }
-
-                        int dstIdx = y * stride + x * 4;
-                        dst[dstIdx] = (byte)Math.Clamp(b * factor, 0, 255);
-                        dst[dstIdx + 1] = (byte)Math.Clamp(g * factor, 0, 255);
-                        dst[dstIdx + 2] = (byte)Math.Clamp(r * factor, 0, 255);
-                        dst[dstIdx + 3] = src[dstIdx + 3];
-                    }
-                });
-            }
-            source.UnlockBits(srcData);
-            result.UnlockBits(dstData);
-            return result;
-        }
-
-        private static Bitmap ConvolveMagnitude(Bitmap source, double[,] kx, double[,] ky)
-        {
-            int w = source.Width;
-            int h = source.Height;
-            Bitmap result = new Bitmap(w, h, PixelFormat.Format32bppArgb);
-            BitmapData srcData = source.LockBits(new Rectangle(0, 0, w, h), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
-            BitmapData dstData = result.LockBits(new Rectangle(0, 0, w, h), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
-
-            unsafe
-            {
-                byte* src = (byte*)srcData.Scan0;
-                byte* dst = (byte*)dstData.Scan0;
-                int stride = srcData.Stride;
-
-                Parallel.For(1, h - 1, y =>
-                {
-                    for (int x = 1; x < w - 1; x++)
-                    {
-                        double rx = 0, gx = 0, bx = 0;
-                        double ry = 0, gy = 0, by = 0;
-
-                        for (int fY = -1; fY <= 1; fY++)
-                        {
-                            for (int fX = -1; fX <= 1; fX++)
-                            {
-                                int idx = (y + fY) * stride + (x + fX) * 4;
-                                bx += src[idx] * kx[fY + 1, fX + 1]; by += src[idx] * ky[fY + 1, fX + 1];
-                                gx += src[idx + 1] * kx[fY + 1, fX + 1]; gy += src[idx + 1] * ky[fY + 1, fX + 1];
-                                rx += src[idx + 2] * kx[fY + 1, fX + 1]; ry += src[idx + 2] * ky[fY + 1, fX + 1];
-                            }
-                        }
-
-                        int dstIdx = y * stride + x * 4;
-                        dst[dstIdx] = (byte)Math.Clamp(Math.Sqrt(bx * bx + by * by), 0, 255);
-                        dst[dstIdx + 1] = (byte)Math.Clamp(Math.Sqrt(gx * gx + gy * gy), 0, 255);
-                        dst[dstIdx + 2] = (byte)Math.Clamp(Math.Sqrt(rx * rx + ry * ry), 0, 255);
-                        dst[dstIdx + 3] = src[dstIdx + 3];
-                    }
-                });
-            }
             source.UnlockBits(srcData);
             result.UnlockBits(dstData);
             return result;
