@@ -8,14 +8,12 @@ namespace ImageProcessing.Core
 {
     public static class ImageProcessor
     {
-        // 1. Image Negation
         public static Bitmap Negate(Bitmap source)
         {
             return ProcessPointOp(source, (r, g, b) =>
                 ((byte)(255 - r), (byte)(255 - g), (byte)(255 - b)));
         }
 
-        // 2. Gamma Correction (using LUT for performance)
         public static Bitmap GammaCorrection(Bitmap source, double gamma)
         {
             byte[] lut = new byte[256];
@@ -27,7 +25,6 @@ namespace ImageProcessing.Core
             return ProcessPointOp(source, (r, g, b) => (lut[r], lut[g], lut[b]));
         }
 
-        // 3. Logarithmic Transformation
         public static Bitmap LogTransform(Bitmap source)
         {
             byte[] lut = new byte[256];
@@ -39,7 +36,6 @@ namespace ImageProcessing.Core
             return ProcessPointOp(source, (r, g, b) => (lut[r], lut[g], lut[b]));
         }
 
-        // 4. Grayscale Conversion
         public static Bitmap ToGrayscale(Bitmap source)
         {
             return ProcessPointOp(source, (r, g, b) =>
@@ -49,7 +45,6 @@ namespace ImageProcessing.Core
             });
         }
 
-        // 5. Histogram Creation (Returns rendered Histogram Image)
         public static Bitmap GetHistogram(Bitmap source)
         {
             int[] hist = new int[256];
@@ -63,7 +58,6 @@ namespace ImageProcessing.Core
                 int bytes = data.Stride * height;
                 for (int i = 0; i < bytes; i += 4)
                 {
-                    // Using fast perceived luminance
                     int gray = (int)(0.299 * ptr[i + 2] + 0.587 * ptr[i + 1] + 0.114 * ptr[i]);
                     hist[gray]++;
                 }
@@ -72,8 +66,6 @@ namespace ImageProcessing.Core
 
             return DrawHistogram(hist);
         }
-
-        // 6. Histogram Equalization
         public static Bitmap HistogramEqualization(Bitmap source)
         {
             int[] hist = new int[256];
@@ -92,8 +84,6 @@ namespace ImageProcessing.Core
                     hist[gray]++;
                 }
             }
-
-            // CDF (Cumulative Distribution Function)
             int[] cdf = new int[256];
             cdf[0] = hist[0];
             for (int i = 1; i < 256; i++) cdf[i] = cdf[i - 1] + hist[i];
@@ -129,12 +119,10 @@ namespace ImageProcessing.Core
             return result;
         }
 
-        // 7 & 8. Convolution Filters (Box / Gaussian)
         public static Bitmap BoxFilter(Bitmap source) => Convolve(source, new double[,] { { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 } }, 1.0 / 9.0);
 
         public static Bitmap GaussianFilter(Bitmap source) => Convolve(source, new double[,] { { 1, 2, 1 }, { 2, 4, 2 }, { 1, 2, 1 } }, 1.0 / 16.0);
 
-        // 9. Sobel Edge Detection
         public static Bitmap Sobel(Bitmap source)
         {
             double[,] gx = { { -1, 0, 1 }, { -2, 0, 2 }, { -1, 0, 1 } };
@@ -142,17 +130,13 @@ namespace ImageProcessing.Core
             return ConvolveMagnitude(source, gx, gy);
         }
 
-        // 10. Laplace Edge Detection
         public static Bitmap Laplace(Bitmap source) => Convolve(source, new double[,] { { 0, 1, 0 }, { 1, -4, 1 }, { 0, 1, 0 } }, 1.0);
 
-        // 11. Harris Keypoint Detection (Corrected with Windowing & NMS)
         public static Bitmap HarrisCorners(Bitmap source)
         {
             Bitmap grayImg = ToGrayscale(source);
             int w = grayImg.Width;
             int h = grayImg.Height;
-
-            // Intermediate buffers for derivatives
             int[] ix2 = new int[w * h];
             int[] iy2 = new int[w * h];
             int[] ixy = new int[w * h];
@@ -163,8 +147,6 @@ namespace ImageProcessing.Core
             unsafe
             {
                 byte* src = (byte*)srcData.Scan0;
-
-                // Pass 1: Compute Sobel Derivatives
                 Parallel.For(1, h - 1, y =>
                 {
                     for (int x = 1; x < w - 1; x++)
@@ -185,8 +167,6 @@ namespace ImageProcessing.Core
                 });
             }
             grayImg.UnlockBits(srcData);
-
-            // Pass 2: Apply 3x3 Window Summation & Calculate R
             double[] rMap = new double[w * h];
             double maxR = 0;
             double k = 0.04;
@@ -199,7 +179,6 @@ namespace ImageProcessing.Core
                 {
                     long sumX2 = 0, sumY2 = 0, sumXY = 0;
 
-                    // 3x3 Local Neighborhood Window
                     for (int wy = -1; wy <= 1; wy++)
                     {
                         int rowOff = (y + wy) * w;
@@ -223,13 +202,11 @@ namespace ImageProcessing.Core
                 lock (maxRLock) { if (localMaxR > maxR) maxR = localMaxR; }
             });
 
-            // Pass 3: Non-Maximum Suppression (NMS) and Drawing
             Bitmap result = (Bitmap)source.Clone();
             BitmapData dstData = result.LockBits(new Rectangle(0, 0, w, h), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
 
-            // Dynamic threshold: Top 1% of the strongest corner response
             double dynamicThreshold = maxR * 0.01;
-            if (dynamicThreshold < 100000) dynamicThreshold = 100000; // Fallback for flat images
+            if (dynamicThreshold < 100000) dynamicThreshold = 100000;
 
             unsafe
             {
@@ -246,7 +223,6 @@ namespace ImageProcessing.Core
                         {
                             bool isLocalMax = true;
 
-                            // 3x3 NMS window to isolate the exact pixel
                             for (int wy = -1; wy <= 1; wy++)
                             {
                                 for (int wx = -1; wx <= 1; wx++)
@@ -263,15 +239,15 @@ namespace ImageProcessing.Core
 
                             if (isLocalMax)
                             {
-                                // Draw a 3x3 red dot to make the corner clearly visible
+
                                 for (int dy = -1; dy <= 1; dy++)
                                 {
                                     for (int dx = -1; dx <= 1; dx++)
                                     {
                                         int drawIdx = (y + dy) * stride + (x + dx) * 4;
-                                        dst[drawIdx] = 0;       // B
-                                        dst[drawIdx + 1] = 0;   // G
-                                        dst[drawIdx + 2] = 255; // R
+                                        dst[drawIdx] = 0;       
+                                        dst[drawIdx + 1] = 0;   
+                                        dst[drawIdx + 2] = 255;
                                     }
                                 }
                             }
@@ -282,9 +258,6 @@ namespace ImageProcessing.Core
             result.UnlockBits(dstData);
             return result;
         }
-
-        // --- Helper Methods ---
-
         private static Bitmap ProcessPointOp(Bitmap source, Func<byte, byte, byte, (byte r, byte g, byte b)> operation)
         {
             int width = source.Width;
@@ -300,8 +273,7 @@ namespace ImageProcessing.Core
                 byte* dstPtr = (byte*)dstData.Scan0;
 
                 Parallel.For(0, height, y =>
-                {
-                    // Span wrapped for bounds-safe internal row processing
+                { 
                     Span<byte> srcRow = new Span<byte>(srcPtr + y * srcData.Stride, srcData.Stride);
                     Span<byte> dstRow = new Span<byte>(dstPtr + y * dstData.Stride, dstData.Stride);
 
@@ -311,7 +283,7 @@ namespace ImageProcessing.Core
                         dstRow[x] = b;
                         dstRow[x + 1] = g;
                         dstRow[x + 2] = r;
-                        dstRow[x + 3] = srcRow[x + 3]; // Preserve Alpha
+                        dstRow[x + 3] = srcRow[x + 3];
                     }
                 });
             }

@@ -26,7 +26,6 @@ namespace ImageProcessing.Analytics
         public ImageStats BeforeStats { get; set; } = new ImageStats();
         public ImageStats AfterStats { get; set; } = new ImageStats();
 
-        // Optional Operation-Specific Data
         public double[]? CurvePoints { get; set; }
         public int[]? OriginalHistogram { get; set; }
         public int[]? EqualizedHistogram { get; set; }

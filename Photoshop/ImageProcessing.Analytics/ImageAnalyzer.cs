@@ -25,7 +25,6 @@ namespace ImageProcessing.Analytics
                 int bytes = data.Stride * height;
                 for (int i = 0; i < bytes; i += 4)
                 {
-                    // Luminance
                     int gray = (int)(0.299 * ptr[i + 2] + 0.587 * ptr[i + 1] + 0.114 * ptr[i]);
                     hist[gray]++;
                     sum += gray;
@@ -54,11 +53,11 @@ namespace ImageProcessing.Analytics
                 MeanIntensity = mean,
                 StdDev = stdDev,
                 Entropy = entropy,
-                Contrast = stdDev, // RMS contrast is equivalent to standard deviation of pixel intensities
+                Contrast = stdDev,
                 Width = width,
                 Height = height,
                 PixelCount = totalPixels,
-                MemoryUsageBytes = totalPixels * 4L, // 32bpp
+                MemoryUsageBytes = totalPixels * 4L,
                 Histogram = hist
             };
         }
@@ -88,8 +87,7 @@ namespace ImageProcessing.Analytics
             {
                 byte* ptr = (byte*)data.Scan0;
                 for (int i = 0; i < data.Stride * resultBmp.Height; i += 4)
-                {
-                    // Core sets B=0, G=0, R=255 for keypoints
+                { 
                     if (ptr[i] == 0 && ptr[i + 1] == 0 && ptr[i + 2] == 255) count++;
                 }
             }
